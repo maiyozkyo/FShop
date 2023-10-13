@@ -10,8 +10,9 @@ namespace FShop.Business.Base
     [Serializable]
     public abstract class BaseEntity
     {
-        //[BsonId]
-        //[BsonRepresentation(MongoDB.Bson.BsonType.ObjectId)]
+        [BsonId]
+        [BsonRepresentation(MongoDB.Bson.BsonType.ObjectId)]
+        protected string _id;
         public string RecID { get; set; }
         public DateTime CreatedOn { get; set; }
         public DateTime ModifiedOn { get; set; }

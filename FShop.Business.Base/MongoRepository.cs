@@ -1,8 +1,10 @@
 ﻿using MongoDB.Bson;
 using MongoDB.Driver;
+using MongoDB.Driver.Linq;
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Linq.Expressions;
 using System.Text;
 using System.Threading.Tasks;
 
@@ -26,8 +28,7 @@ namespace FShop.Business.Base
 
         public virtual async Task<TEntity> GetByID(string id)
         {
-            //var filter = Builders<TEntity>.Filter.Eq("_id", id);
-            var data = DBSet.Find(id).FirstOrDefault();
+            var data = DBSet.Find(FilterID(id)).FirstOrDefault();
             return data;
         }
 
@@ -39,13 +40,19 @@ namespace FShop.Business.Base
 
         public virtual async Task<bool> Delete(string id)
         {
-            var res = await DBSet.DeleteOneAsync(id);
+            var res = await DBSet.DeleteOneAsync(FilterID(id));
             return res.IsAcknowledged;
         }
 
         public virtual async Task<IEnumerable<TEntity>> GetAll()
         {
             var res = await DBSet.Find(new BsonDocument()).ToListAsync();
+            return res;
+        }
+
+        public virtual IMongoQueryable<TEntity> Get(Expression<Func<TEntity, bool>> condition)
+        {
+            var res = DBSet.AsQueryable().Where(condition);
             return res;
         }
 
