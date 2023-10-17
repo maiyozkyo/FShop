@@ -28,15 +28,31 @@ namespace FShop.Controllers
         public async Task<IActionResult> All()
         {
             var sMethod = Request.Form["Method"];
-            var form = Request.Form.Where(x => x.Key != "Method").ToDictionary(x => x.Key, y => y.Value.ToString());
+            var sParams = Request.Form["Params"];
+            var param = sParams.ToDictionary(x => x);
+            //var param = JsonSerializer.Deserialize<Dictionary<string, string>>(sParams);
+
+
             Type tType = userBusiness.GetType();
             MethodInfo method = tType.GetMethod(sMethod);
             if (method != null)
             {
-                var res = await (dynamic)method.Invoke(userBusiness, form.Values.Cast<object>().ToArray());
+                var paramInfos = method.GetParameters();
+                var lstObj = new List<object>();
+                for(var idx = 0; idx < paramInfos.Length; idx++)
+                {
+                    if (paramInfos[idx].ParameterType.isc)
+                    var obj = 
+                }
+
+                foreach(var value in param.Values)
+                {
+                    lstObj.Add(value);
+                }
+                var res = await (dynamic)method.Invoke(userBusiness, lstObj.ToArray());
                 return Ok(res);
             }
-            return null;
+            return NotFound();
         }
     }
 }

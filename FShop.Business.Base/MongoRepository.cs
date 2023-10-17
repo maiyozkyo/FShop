@@ -63,7 +63,7 @@ namespace FShop.Business.Base
 
         public static FilterDefinition<TEntity> FilterID(string id)
         {
-            return Builders<TEntity>.Filter.Eq("Id", id);
+            return Builders<TEntity>.Filter.Eq("RecID", id);
         }
     }
 }
