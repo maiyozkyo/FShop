@@ -29,6 +29,8 @@ namespace FShop.Business.User
                 }
                 else
                 {
+                    user.CreatedOn = DateTime.UtcNow;
+                    user.ModifiedOn = DateTime.UtcNow;
                     var res = await Repository.Add(user);
                     return res;
                 }
@@ -45,12 +47,12 @@ namespace FShop.Business.User
         }
 
         public async Task<UserModel> LoginAsync(string phone,string password) {
-            var user = Repository.Get(x => x.Phone == phone).FirstOrDefault();
+            var user = Repository.Get(x => x.Phone == phone && x.DeletedOn == null).FirstOrDefault();
             if (user != null)
             {
                 if (user.Password == password)
                 {
-
+                    //tao token
                 }
                 else
                 {

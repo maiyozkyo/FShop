@@ -1,9 +1,9 @@
 using FShop.Business.Base;
 using FShop.Business.User;
-using FShop.Models.User;
+using FShop.Models.Request;
 using Microsoft.AspNetCore.Mvc;
+using Newtonsoft.Json;
 using System.Reflection;
-using System.Text.Json;
 
 namespace FShop.Controllers
 {
@@ -25,30 +25,23 @@ namespace FShop.Controllers
         }
 
         [HttpPost("all")]
-        public async Task<IActionResult> All()
+        public async Task<IActionResult> All([FromForm] RequestMsg requestMsg)
         {
-            var sMethod = Request.Form["Method"];
-            var sParams = Request.Form["Params"];
-            var param = sParams.ToDictionary(x => x);
-            //var param = JsonSerializer.Deserialize<Dictionary<string, string>>(sParams);
-
-
             Type tType = userBusiness.GetType();
-            MethodInfo method = tType.GetMethod(sMethod);
+            MethodInfo method = tType.GetMethod(requestMsg.Method);
             if (method != null)
             {
-                var paramInfos = method.GetParameters();
                 var lstObj = new List<object>();
-                for(var idx = 0; idx < paramInfos.Length; idx++)
+                var lstParams = JsonConvert.DeserializeObject<List<string>>(requestMsg.Params);
+
+                var paramInfos = method.GetParameters();
+                for (var idx = 0; idx < paramInfos.Length; idx++)
                 {
-                    if (paramInfos[idx].ParameterType.isc)
-                    var obj = 
+                    var type = paramInfos[idx].ParameterType;
+                    var obj = JsonConvert.DeserializeObject(lstParams[idx], type);
+                    lstObj.Add(obj);
                 }
 
-                foreach(var value in param.Values)
-                {
-                    lstObj.Add(value);
-                }
                 var res = await (dynamic)method.Invoke(userBusiness, lstObj.ToArray());
                 return Ok(res);
             }
