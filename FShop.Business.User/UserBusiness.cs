@@ -1,7 +1,6 @@
 ﻿using FShop.Business.Base;
 using FShop.Models.User;
 using MongoDB.Driver;
-using System.Numerics;
 
 namespace FShop.Business.User
 {
@@ -13,6 +12,10 @@ namespace FShop.Business.User
 
         public async Task<UserModel> AddUpdateUserAsync(UserModel user)
         {
+            if (user == null)
+            {
+                return null;
+            }
             try
             {
                 var addedUser = Repository.Get(x => x.Phone == user.Phone).FirstOrDefault();
@@ -22,7 +25,7 @@ namespace FShop.Business.User
                     addedUser.UserName = user.UserName;
                     addedUser.NickName = user.NickName;
                     addedUser.Email = user.Email;
-                    addedUser.Password = user.Password;
+                    //addedUser.Password = user.Password;
                     addedUser.ModifiedOn = DateTime.UtcNow;
                     await Repository.Update(addedUser.RecID, addedUser);
                     return addedUser;
@@ -31,6 +34,7 @@ namespace FShop.Business.User
                 {
                     user.CreatedOn = DateTime.UtcNow;
                     user.ModifiedOn = DateTime.UtcNow;
+                    user.Password = BCryptBusiness.Hash(user.Password);
                     var res = await Repository.Add(user);
                     return res;
                 }
@@ -50,13 +54,13 @@ namespace FShop.Business.User
             var user = Repository.Get(x => x.Phone == phone && x.DeletedOn == null).FirstOrDefault();
             if (user != null)
             {
-                if (user.Password == password)
+                if (BCryptBusiness.Verify(password, user.Password))
                 {
                     //tao token
                 }
                 else
                 {
-                    return null;
+                    user = null;
                 }
             }
             return user;
