@@ -9,11 +9,11 @@ namespace FShop.Controllers
 {
     [ApiController]
     [Route("api/[controller]")]
-    public class WeatherForecastController : ControllerBase
+    public class UserController : ControllerBase
     {
         private static UserBusiness userBusiness;
 
-        public WeatherForecastController(IMongoDBContext dbContext)
+        public UserController(IMongoDBContext dbContext)
         {
             userBusiness = new UserBusiness(dbContext);
         }
