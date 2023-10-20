@@ -1,0 +1,4 @@
+Service				Port
+Gateway				8000
+User				8001
+Fruit				8002
