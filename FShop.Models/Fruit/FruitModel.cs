@@ -10,6 +10,9 @@ namespace FShop.Models.Fruit
     public class FruitModel : BaseEntity
     {
         public string FruitName { get; set; }
-
+        public double Price { get; set; }
+        public string Unit { get; set; }
+        public string Note { get; set; }
+        public bool Active { get; set; }
     }
 }

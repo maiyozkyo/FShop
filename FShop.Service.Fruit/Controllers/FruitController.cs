@@ -3,18 +3,22 @@ using FShop.Models.Request;
 using Microsoft.AspNetCore.Mvc;
 using System.Reflection;
 using Newtonsoft.Json;
-using Fshop.Business.Fruit;
+using FShop.Business.Fruit;
+using Microsoft.AspNetCore.Authorization;
 
 namespace FShop.Service.Fruit.Controllers
 {
+    [Authorize]
     [ApiController]
     [Route("api/[controller]")]
     public class FruitController : ControllerBase
     {
         private static FruitBusiness fruitBusiess;
-        public FruitController(IMongoDBContext dBContext)
+        private readonly IConfiguration _Configuration;
+        public FruitController(IMongoDBContext dBContext, IConfiguration _IConfiguration)
         {
-            fruitBusiess = new FruitBusiness(dBContext);
+            _Configuration = _IConfiguration;
+            fruitBusiess = new FruitBusiness(dBContext, _Configuration);
         }
 
         [HttpPost("test")]

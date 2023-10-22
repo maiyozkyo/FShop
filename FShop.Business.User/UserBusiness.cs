@@ -1,13 +1,22 @@
 ﻿using FShop.Business.Base;
 using FShop.Models.User;
-using MongoDB.Driver;
+using Microsoft.Extensions.Configuration;
+using Microsoft.IdentityModel.Tokens;
+using System.IdentityModel.Tokens.Jwt;
+using System.Security.Claims;
+using System.Text;
+using System.Text.Json;
 
 namespace FShop.Business.User
 {
     public class UserBusiness : BaseBusiness<UserModel>
     {
-        public UserBusiness(IMongoDBContext dbContext) : base(dbContext)
+        private readonly IConfiguration Configuration;
+        private readonly string jwtSerect;
+        public UserBusiness(IMongoDBContext dbContext, IConfiguration _IConfiguration) : base(dbContext)
         {
+            Configuration = _IConfiguration;
+            jwtSerect = Configuration.GetSection("JWTSerect").Value;
         }
 
         public async Task<UserModel> AddUpdateUserAsync(UserModel user)
@@ -18,7 +27,7 @@ namespace FShop.Business.User
             }
             try
             {
-                var addedUser = Repository.Get(x => x.Phone == user.Phone).FirstOrDefault();
+                var addedUser = await Repository.GetOneAsync(x => x.Phone == user.Phone);
                 if (addedUser != null)
                 {
                     addedUser.Phone = user.Phone;
@@ -50,21 +59,58 @@ namespace FShop.Business.User
             return await Repository.GetByID(id);
         }
 
-        public async Task<UserModel> LoginAsync(string phone,string password) {
-            var user = Repository.Get(x => x.Phone == phone && x.DeletedOn == null).FirstOrDefault();
+        public async Task<UserDTO> LoginAsync(string phone,string password) {
+            var user = await Repository.GetOneAsync(x => x.Phone == phone && x.DeletedOn == null);
             if (user != null)
             {
                 if (BCryptBusiness.Verify(password, user.Password))
                 {
                     //tao token
+                    user = await CreateJWTTokenAsync(user);
+                    return JsonSerializer.Deserialize<UserDTO>(JsonSerializer.Serialize(user));
                 }
                 else
                 {
-                    user = null;
+                    return null;
                 }
+            }
+            return null;
+        }
+
+        private async Task<UserModel> CreateJWTTokenAsync(UserModel user)
+        {
+            if (user != null)
+            {
+                try
+                {
+                    var jwtTokenHandler = new JwtSecurityTokenHandler();
+                    var key = Encoding.ASCII.GetBytes(jwtSerect);
+
+                    var identity = new ClaimsIdentity(new Claim[]
+                    {
+                    new Claim(ClaimTypes.Name, $"{user.Phone}"),
+                    new Claim(ClaimTypes.Role, user.Role ?? "")
+                    });
+
+                    var credentials = new SigningCredentials(new SymmetricSecurityKey(key), SecurityAlgorithms.HmacSha512);
+
+                    var tokenDescriptor = new SecurityTokenDescriptor
+                    {
+                        Subject = identity,
+                        Expires = DateTime.UtcNow.AddDays(1),
+                        SigningCredentials = credentials,
+                    };
+
+                    var token = jwtTokenHandler.CreateToken(tokenDescriptor);
+                    user.Token = jwtTokenHandler.WriteToken(token);
+                }
+                catch (Exception ex)
+                {
+                    return null;
+                }
+                
             }
             return user;
         }
-
     }
 }

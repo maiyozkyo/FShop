@@ -1,19 +1,46 @@
 ﻿using FShop.Business.Base;
 using FShop.Models.Fruit;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+using Microsoft.Extensions.Configuration;
 
-namespace Fshop.Business.Fruit
+namespace FShop.Business.Fruit
 {
     public class FruitBusiness : BaseBusiness<FruitModel>
     {
-        public FruitBusiness(IMongoDBContext dbContext) : base(dbContext)
+        private readonly IConfiguration Configuration;
+        public FruitBusiness(IMongoDBContext dbContext, IConfiguration _IConfiguration) : base(dbContext)
         {
+            Configuration = _IConfiguration;
         }
 
+        public async Task<FruitModel> AddUpdateFruit(FruitModel fruit)
+        {
+            if (fruit == null)
+            {
+                return null;
+            }
+            
+            try
+            {
+                var addedFruit = await Repository.GetOneAsync(f => f.RecID == fruit.RecID);
+                //New fruit
+                if (addedFruit != null)
+                {
 
+                }
+                else
+                {
+                    fruit.CreatedOn = DateTime.UtcNow;
+                    fruit.ModifiedOn = DateTime.UtcNow;
+                    fruit.Active = true;
+                    var res = await Repository.Add(fruit);
+                    return res;
+                }
+            }
+            catch (Exception ex)
+            {
+
+            }
+            return fruit;
+        }
     }
 }

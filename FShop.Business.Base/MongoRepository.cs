@@ -56,6 +56,12 @@ namespace FShop.Business.Base
             return res;
         }
 
+        public virtual Task<TEntity> GetOneAsync(Expression<Func<TEntity, bool>> condition)
+        {
+            var res = DBSet.AsQueryable().Where(condition).FirstOrDefaultAsync();
+            return res;
+        }
+
         public void Dispose()
         {
             GC.SuppressFinalize(this);

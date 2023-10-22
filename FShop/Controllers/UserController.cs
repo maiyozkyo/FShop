@@ -1,27 +1,46 @@
 using FShop.Business.Base;
 using FShop.Business.User;
 using FShop.Models.Request;
+using FShop.Models.User;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Newtonsoft.Json;
 using System.Reflection;
 
 namespace FShop.Controllers
 {
+    [Authorize]
     [ApiController]
     [Route("api/[controller]")]
     public class UserController : ControllerBase
     {
         private static UserBusiness userBusiness;
-
-        public UserController(IMongoDBContext dbContext)
+        private readonly IConfiguration _Configuration;
+        public UserController(IMongoDBContext dbContext, IConfiguration _IConfiguration)
         {
-            userBusiness = new UserBusiness(dbContext);
+            _Configuration = _IConfiguration;
+            userBusiness = new UserBusiness(dbContext, _Configuration);
         }
 
         [HttpPost("test")]
         public async Task<IActionResult> Test()
         {
             return Ok("OK");
+        }
+
+        [AllowAnonymous]
+        [HttpPost("LoginAsync")]
+        public async Task<IActionResult> LoginAsync([FromForm] RequestMsg requestMsg)
+        {
+            if (!string.IsNullOrEmpty(requestMsg.Params))
+            {
+                var lstParams = JsonConvert.DeserializeObject<List<string>>(requestMsg.Params);
+                var phone = JsonConvert.DeserializeObject<string>(lstParams[0]);
+                var pw = JsonConvert.DeserializeObject<string>(lstParams[1]);
+                var loginUser = await userBusiness.LoginAsync(phone, pw);
+                return Ok(loginUser);
+            }
+            return BadRequest("Sai");
         }
 
         [HttpPost("all")]
