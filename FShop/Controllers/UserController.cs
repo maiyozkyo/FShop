@@ -1,4 +1,4 @@
-using FShop.Business.Base;
+﻿using FShop.Business.Base;
 using FShop.Business.User;
 using FShop.Models.Request;
 using FShop.Models.User;
@@ -38,7 +38,14 @@ namespace FShop.Controllers
                 var phone = JsonConvert.DeserializeObject<string>(lstParams[0]);
                 var pw = JsonConvert.DeserializeObject<string>(lstParams[1]);
                 var loginUser = await userBusiness.LoginAsync(phone, pw);
-                return Ok(loginUser);
+                if (loginUser != null)
+                {
+                    return Ok(loginUser);
+                }
+                else
+                {
+                    return NotFound("Không tìm thấy user");
+                }
             }
             return BadRequest("Sai");
         }

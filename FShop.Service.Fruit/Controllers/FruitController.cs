@@ -5,6 +5,7 @@ using System.Reflection;
 using Newtonsoft.Json;
 using FShop.Business.Fruit;
 using Microsoft.AspNetCore.Authorization;
+using FShop.Models.Fruit;
 
 namespace FShop.Service.Fruit.Controllers
 {
@@ -25,6 +26,13 @@ namespace FShop.Service.Fruit.Controllers
         public async Task<IActionResult> Test()
         {
             return Ok("Test");
+        }
+
+        [HttpPost("Add")]
+        public async Task<IActionResult> AddAsync([FromBody] FruitModel fruit)
+        {
+            var res = await fruitBusiess.AddUpdateFruit(fruit);
+            return Ok(res);
         }
 
         [HttpPost("all")]
