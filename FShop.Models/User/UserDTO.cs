@@ -17,6 +17,7 @@ namespace FShop.Models.User
         public string Role { get; set; }
         public bool Active { get; set; }
         public bool IsAdmin { get; set; }
+        public string UserType { get; set; }
 
         public static explicit operator UserDTO(UserModel v)
         {
