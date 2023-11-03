@@ -26,6 +26,12 @@ namespace FShop.Business.Base
             return obj;
         }
 
+        public virtual async Task<IEnumerable<TEntity>> Add(IEnumerable<TEntity> lstObj)
+        {
+            await DBSet.InsertManyAsync(lstObj);
+            return lstObj;
+        }
+
         public virtual async Task<TEntity> GetByID(string id)
         {
             var data = DBSet.Find(FilterID(id)).FirstOrDefault();

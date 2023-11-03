@@ -42,5 +42,12 @@ namespace FShop.Business.Fruit
             }
             return fruit;
         }
+
+        public async Task<List<FruitModel>> FakeFruits()
+        {
+            var fruits = FruitModel.Fake(20);
+            await Repository.Add(fruits);
+            return fruits;
+        }
     }
 }
