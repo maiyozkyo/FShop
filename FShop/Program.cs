@@ -22,7 +22,13 @@ service.AddCors(option =>
         .AllowAnyHeader();
     });
 });
-
+#region Cookie
+service.Configure<CookiePolicyOptions>(options =>
+{
+    // This lambda determines whether user consent for non-essential cookies is needed for a given request.
+    options.CheckConsentNeeded = context => true;
+});
+#endregion
 #region Authen
 var jwtSerect = Encoding.ASCII.GetBytes(configuration.GetSection("JWTSerect").Value);
 service.AddAuthentication(option =>

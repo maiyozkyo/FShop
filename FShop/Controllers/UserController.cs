@@ -40,6 +40,19 @@ namespace FShop.Controllers
                 var loginUser = await userBusiness.LoginAsync(phone, pw);
                 if (loginUser != null)
                 {
+                    var cookieOptions = new CookieOptions
+                    {
+                        // Set the cookie properties
+                        Path = "/",
+                        Expires = DateTime.UtcNow.AddDays(7),
+                        Secure = false, // Use "false" if not using HTTPS
+                        HttpOnly = true,
+                        SameSite = SameSiteMode.Unspecified
+                    };
+
+                    Response.Cookies.Append("testCookie", "Cookie content", cookieOptions);
+
+                    loginUser.ReToken = null;
                     return Ok(loginUser);
                 }
                 else

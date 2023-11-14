@@ -4,6 +4,7 @@ using Microsoft.Extensions.Configuration;
 using Microsoft.IdentityModel.Tokens;
 using System.IdentityModel.Tokens.Jwt;
 using System.Security.Claims;
+using System.Security.Cryptography;
 using System.Text;
 using System.Text.Json;
 
@@ -67,7 +68,9 @@ namespace FShop.Business.User
                 {
                     //tao token
                     user = await CreateJWTTokenAsync(user);
-                    return JsonSerializer.Deserialize<UserDTO>(JsonSerializer.Serialize(user));
+                    var userDTO = JsonSerializer.Deserialize<UserDTO>(JsonSerializer.Serialize(user));
+                    userDTO.ReToken = GenReToken();
+                    return userDTO;
                 }
                 else
                 {
@@ -111,6 +114,16 @@ namespace FShop.Business.User
                 
             }
             return user;
+        }
+
+        private string GenReToken()
+        {
+            var randomNumber = new byte[32];
+            using (var rng = RandomNumberGenerator.Create())
+            {
+                rng.GetBytes(randomNumber);
+                return Convert.ToBase64String(randomNumber);
+            }
         }
     }
 }

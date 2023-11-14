@@ -13,6 +13,7 @@ namespace FShop.Models.User
         public string NickName { get; set; }
         public string Email { get; set; }
         public string Token { get; set; }
+        public string ReToken { get; set; }
         public string Phone { get; set; }
         public string Role { get; set; }
         public bool Active { get; set; }

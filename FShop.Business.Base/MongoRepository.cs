@@ -68,6 +68,14 @@ namespace FShop.Business.Base
             return res;
         }
 
+        public virtual IFindFluent<TEntity, TEntity> GetPage(int page)
+        {
+            var maxSize = 10;
+            var sort = Builders<TEntity>.Sort.Descending("CreatedOn");
+            var res = DBSet.Find(new BsonDocument()).Sort(sort).Skip(maxSize).Limit(maxSize);
+            return res;
+        }
+
         public void Dispose()
         {
             GC.SuppressFinalize(this);

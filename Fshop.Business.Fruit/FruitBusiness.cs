@@ -1,6 +1,7 @@
 ﻿using FShop.Business.Base;
 using FShop.Models.Fruit;
 using Microsoft.Extensions.Configuration;
+using MongoDB.Driver;
 
 namespace FShop.Business.Fruit
 {
@@ -48,6 +49,12 @@ namespace FShop.Business.Fruit
             var fruits = FruitModel.Fake(20);
             await Repository.Add(fruits);
             return fruits;
+        }
+
+        public async Task<List<FruitModel>> GetListFruits(int page = 0)
+        {
+            var lstFruit = await Repository.GetPage(page).ToListAsync();
+            return lstFruit;
         }
     }
 }

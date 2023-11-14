@@ -29,14 +29,14 @@ namespace FShop.Service.Fruit.Controllers
         }
 
         [HttpPost("Add")]
-        public async Task<IActionResult> AddAsync([FromBody] FruitModel fruit)
+        public async Task<IActionResult> AddAsync([FromForm] FruitModel fruit)
         {
             var res = await fruitBusiess.AddUpdateFruit(fruit);
             return Ok(res);
         }
 
         [HttpPost("all")]
-        public async Task<IActionResult> All([FromBody] RequestMsg requestMsg)
+        public async Task<IActionResult> All([FromForm] RequestMsg requestMsg)
         {
             Type tType = fruitBusiess.GetType();
             MethodInfo method = tType.GetMethod(requestMsg.Method);
